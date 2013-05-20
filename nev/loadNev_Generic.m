@@ -66,14 +66,24 @@ clear eventData;
 if ~isempty(Q)
     % Add trial ids according to callback function provided
     if ~isempty(trialIdFn) 
+        nNoTrialID = 0;
         for iq = 1:length(Q)
-            Q(iq).trialId = trialIdFn(Q(iq));
+            try
+                Q(iq).trialId = trialIdFn(Q(iq));
+            catch err
+                Q(iq).trialId = NaN;
+                nNoTrialID = nNoTrialID + 1;
+            end
+        end
+        
+        if nNoTrialID
+            fprintf('%i trials given NaN trialID\n', nNoTrialID)
         end
     else
         % empty by default
         [Q.trialId] = deal([]);
     end
-
+    
     % Add .type and .version fields as specified
     [Q.type] = deal(type);
     [Q.version] = deal(version);
